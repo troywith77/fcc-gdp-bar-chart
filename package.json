@@ -1,0 +1,20 @@
+{
+  "name": "gdp-bar-chart",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:troywith77/gdp-bar-chart.git",
+  "author": "troywith77 <ruitang307@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel index.html --no-hmr"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "d3": "^5.7.0",
+    "parcel-bundler": "^1.10.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-polyfill": "^6.26.0"
+  }
+}
