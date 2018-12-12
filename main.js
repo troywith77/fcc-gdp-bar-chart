@@ -9,6 +9,7 @@ const fetchData = async () => {
 }
 
 const main = async () => {
+  const tooltip = document.querySelector('#tooltip')
   const meta = await fetchData()
   const { data } = meta
   console.log(meta)
@@ -30,14 +31,8 @@ const main = async () => {
   const xAxis = d3.axisBottom(xScale)
   const yAxis = d3.axisLeft(yScale)
   
-  d3
-    .select('body')
-    .append('h1')
-    .attr('id', 'title')
-    .text('United States GDP')
-  
   const svg = d3
-    .select('body')
+    .select('#container')
     .append('svg')
     .attr('width', w)
     .attr('height', h)
@@ -55,30 +50,47 @@ const main = async () => {
     .attr('id', 'x-axis')
     .call(xAxis)
     
-    svg
+  svg
     .append('g')
     .attr('transform', `translate(${padding}, 0)`)
     .attr('id', 'y-axis')
     .call(yAxis)
 
-
-  const rects = svg.append('g')
-  data.forEach((item) => {
-    const height = h - padding - yScale(item[1])
-    const year = +item[0].split('-')[0]
-    const offset = Math.floor(parseInt(item[0].split('-')[1]) / 3)
-    rects
-      .append('rect')
-      .attr('class', 'bar')
-      .attr('width', w / data.length)
-      .attr('height', height)
-      .attr('x', xScale(year + offset / 4))
-      .attr('y', h - padding - height)
-      .attr('data-date', item[0])
-      .attr('data-gdp', item[1])
-      .attr('fill', 'rgb(51, 173, 255)')
-  })
-    
+  const barWidth = w / data.length
+  svg
+    .append('g')
+    .attr('class', 'rects')
+  svg
+    .select('.rects')
+    .selectAll('rect')
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('class', 'bar')
+    .attr('width', barWidth)
+    .attr('height', d => h - padding - yScale(d[1]))
+    .attr('x', (d, i) => {
+      const year = Number(d[0].split('-')[0])
+      const quater = Number((i % 4 / 4))
+      return xScale(year + quater)
+    })
+    .attr('y', d => yScale(d[1]))
+    .attr('data-date', d => d[0])
+    .attr('data-gdp', d => d[1])
+    .attr('fill', 'rgb(51, 173, 255)')
+    .on('mouseover', (d, i) => {
+      const year = Number(d[0].split('-')[0])
+      const quater = Number((i % 4 / 4))
+      tooltip.style.display = 'flex'
+      tooltip.style.transform = `translate(${xScale(year + quater + 5)}px, 320px)`
+      tooltip.querySelector('#tooltip-date').innerText = d[0]
+      tooltip.querySelector('#tooltip-gdp').innerText = `$${d[1].toLocaleString()} Billion`
+    })
+    .on('mouseout', () => {
+      tooltip.style.display = 'none'
+      tooltip.querySelector('#tooltip-date').innerText = ''
+      tooltip.querySelector('#tooltip-gdp').innerText = ''
+    })
 }
 
 main()
